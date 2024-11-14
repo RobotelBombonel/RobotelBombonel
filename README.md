@@ -1,0 +1,5 @@
+- 👋 Hi, I’m @RobotelBombonel
+- 👀 I’m interested in creating sites
+- 🌱 I’m currently learning how to create sites
+- 💞️ I’m looking to collaborate on discord
+- 📫 How to reach me -my discord name: blue_radiance
