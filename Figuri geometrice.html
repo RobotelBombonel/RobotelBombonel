@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="ro">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Forme 3D Interactive - Doar Contur</title>
+
+  <style>
+
+    body {
+
+      margin: 0;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      background-color: #333;
+
+      color: white;
+
+      font-family: Arial, sans-serif;
+
+    }
+
+    #controls {
+
+      display: flex;
+
+      gap: 15px;
+
+      margin: 10px;
+
+    }
+
+    canvas {
+
+      cursor: grab;
+
+    }
+
+    canvas:active {
+
+      cursor: grabbing;
+
+    }
+
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+</head>
+
+<body>
+
+  <h1>Forme 3D Doar Contur</h1>
+
+  
+
+  <!-- Controale pentru selectarea formei și a culorii -->
+
+  <div id="controls">
+
+    <label for="shapeSelector">Alege forma geometrică:</label>
+
+    <select id="shapeSelector">
+
+      <option value="cube">Cub</option>
+
+      <option value="parallelepiped">Paralelipiped</option>
+
+      <option value="rectangularParallelepiped">Paralelipiped Dreptunghic</option>
+
+      <option value="cuboid">Cuboid</option>
+
+      <option value="sphere">Sferă</option>
+
+      <option value="ellipsoid">Elipsoid</option>
+
+      <option value="paraboloid">Paraboloid</option>
+
+      <option value="hyperboloid">Hiperboloid</option>
+
+      <option value="oloid">Oloid</option>
+
+      <option value="ovoid">Ovoid</option>
+
+      <option value="tetrahedron">Tetraedru</option>
+
+      <option value="icosahedron">Icosaedru</option>
+
+      <option value="dodecahedron">Dodecaedru</option>
+
+      <option value="prism">Prismă</option>
+
+      <option value="cylinder">Cilindru</option>
+
+      <option value="cone">Con</option>
+
+    </select>
+
+
+
+    <label for="colorPicker">Alege culoarea conturului:</label>
+
+    <input type="color" id="colorPicker" value="#00ff00">
+
+
+
+    <label for="opacitySlider">Opacitate conturului:</label>
+
+    <input type="range" id="opacitySlider" min="0" max="1" step="0.1" value="1">
+
+  </div>
+
+  
+
+  <script>
+
+    // Inițializare scenă, cameră și renderer
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    camera.position.z = 5;
+
+
+
+    const renderer = new THREE.WebGLRenderer();
+
+    renderer.setSize(window.innerWidth, window.innerHeight * 0.8);
+
+    document.body.appendChild(renderer.domElement);
+
+
+
+    // Materialul conturului
+
+    let outlineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth: 2, opacity: 1, transparent: true });
+
+    
+
+    let shape = null;
+
+    let outlineShape = null;
+
+
+
+    // Controlul rotației formei cu mouse-ul
+
+    let isDragging = false;
+
+    let previousMousePosition = { x: 0, y: 0 };
+
+    let selectedObject = null;
+
+
+
+    renderer.domElement.addEventListener('mousedown', function (event) {
+
+      isDragging = true;
+
+      selectedObject = event.target;
+
+
+
+      // Calculăm coordonatele mouse-ului în raport cu canvasul
+
+      previousMousePosition = { x: event.clientX, y: event.clientY };
+
+    });
+
+
+
+    renderer.domElement.addEventListener('mousemove', function (event) {
+
+      if (isDragging && selectedObject) {
+
+        const deltaMove = { 
+
+          x: event.clientX - previousMousePosition.x,
+
+          y: event.clientY - previousMousePosition.y
+
+        };
+
+        // Actualizăm rotația în funcție de mișcarea mouse-ului
+
+        if (shape) {
+
+          shape.rotation.y += deltaMove.x * 0.01;
+
+          shape.rotation.x += deltaMove.y * 0.01;
+
+          outlineShape.rotation.y += deltaMove.x * 0.01;
+
+          outlineShape.rotation.x += deltaMove.y * 0.01;
+
+        }
+
+      }
+
+      previousMousePosition = { x: event.clientX, y: event.clientY };
+
+    });
+
+
+
+    window.addEventListener('mouseup', function () {
+
+      isDragging = false;
+
+    });
+
+
+
+    // Funcție pentru schimbarea formei geometrice
+
+    function createShape(shapeType) {
+
+      // Dacă există forme anterioare, le eliminăm din scenă
+
+      if (shape) scene.remove(shape);
+
+      if (outlineShape) scene.remove(outlineShape);
+
+
+
+      let geometry;
+
+      switch (shapeType) {
+
+        case 'cube':
+
+          geometry = new THREE.BoxGeometry(1, 1, 1);
+
+          break;
+
+        case 'parallelepiped':
+
+          geometry = new THREE.BoxGeometry(1, 2, 0.5);
+
+          break;
+
+        case 'rectangularParallelepiped':
+
+          geometry = new THREE.BoxGeometry(1.5, 1, 0.5);
+
+          break;
+
+        case 'cuboid':
+
+          geometry = new THREE.BoxGeometry(1.5, 1, 1);
+
+          break;
+
+        case 'sphere':
+
+          geometry = new THREE.SphereGeometry(0.7, 32, 32);
+
+          break;
+
+        case 'ellipsoid':
+
+          geometry = new THREE.SphereGeometry(0.7, 32, 32).scale(1, 1.5, 1);
+
+          break;
+
+        case 'paraboloid':
+
+          geometry = new THREE.ConeGeometry(0.7, 1.5, 32).scale(1, 1, 0.5);
+
+          break;
+
+        case 'hyperboloid':
+
+          geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 32).scale(1, 1.5, 1);
+
+          break;
+
+        case 'oloid':
+
+          const oloidGeometry = new THREE.TorusGeometry(0.5, 0.25, 16, 100);
+
+          geometry = oloidGeometry.scale(1.2, 0.5, 1.2);
+
+          break;
+
+        case 'ovoid':
+
+          geometry = new THREE.SphereGeometry(0.7, 32, 32).scale(1, 1.3, 1);
+
+          break;
+
+        case 'tetrahedron':
+
+          geometry = new THREE.TetrahedronGeometry(1);
+
+          break;
+
+        case 'icosahedron':
+
+          geometry = new THREE.IcosahedronGeometry(1);
+
+          break;
+
+        case 'dodecahedron':
+
+          geometry = new THREE.DodecahedronGeometry(1);
+
+          break;
+
+        case 'prism':
+
+          geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 3);
+
+          break;
+
+        case 'cylinder':
+
+          geometry = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 32);
+
+          break;
+
+        case 'cone':
+
+          geometry = new THREE.ConeGeometry(0.5, 1.5, 32);
+
+          break;
+
+      }
+
+
+
+      // Crează EdgesGeometry pentru outline (muchiile obiectului)
+
+      const edges = new THREE.EdgesGeometry(geometry);
+
+      outlineShape = new THREE.LineSegments(edges, outlineMaterial);
+
+
+
+      // Creăm un obiect pentru forma geometrică și adăugăm conturul
+
+      shape = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true, transparent: true, opacity: 0 }));
+
+
+
+      // Adăugăm atât forma cât și conturul în scenă
+
+      scene.add(shape);
+
+      scene.add(outlineShape);
+
+    }
+
+
+
+    // Eveniment de schimbare a formei
+
+    const shapeSelector = document.getElementById("shapeSelector");
+
+    shapeSelector.addEventListener("change", (event) => {
+
+      createShape(event.target.value);
+
+    });
+
+
+
+    // Schimbarea culorii conturului
+
+    const colorPicker = document.getElementById("colorPicker");
+
+    colorPicker.addEventListener("input", (event) => {
+
+      outlineMaterial.color.set(event.target.value);
+
+    });
+
+
+
+    // Schimbarea opacității conturului
+
+    const opacitySlider = document.getElementById("opacitySlider");
+
+    opacitySlider.addEventListener("input", (event) => {
+
+      outlineMaterial.opacity = event.target.value;
+
+    });
+
+
+
+    // Inițializare cu forma implicită
+
+    createShape("cube");
+
+
+
+    // Adăugarea controlului de zoom
+
+    window.addEventListener('wheel', function (event) {
+
+      event.preventDefault();
+
+      camera.position.z += event.deltaY * 0.01;
+
+      if (camera.position.z < 2) camera.position.z = 2;  // Mărim limita minimă de zoom
+
+    });
+
+
+
+    // Animația
+
+    function animate() {
+
+      requestAnimationFrame(animate);
+
+      renderer.render(scene, camera);
+
+    }
+
+    animate();
+
+
+
+    // Redimensionare automată
+
+    window.addEventListener('resize', () => {
+
+      renderer.setSize(window.innerWidth, window.innerHeight * 0.8);
+
+      camera.aspect = window.innerWidth / (window.innerHeight * 0.8);
+
+      camera.updateProjectionMatrix();
+
+    });
+
+  </script>
+
+</body>
+
+</html>
