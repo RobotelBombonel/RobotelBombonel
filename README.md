@@ -1,5 +1,1 @@
-- 👋 Hi, I’m @RobotelBombonel
-- 👀 I’m interested in creating sites
-- 🌱 I’m currently learning how to create sites
-- 💞️ I’m looking to collaborate on discord
-- 📫 How to reach me -my discord name: blue_radiance
+Hello, my name is RobotelBombonel, call me RBBL. I am working on projects like games, designs or creating an AI. I'm currecly creating an AI called OctoBlank, this AI will be capable of understanding images, creating images or even give you a full understand in coding. But as of now it is just a chatting AI
