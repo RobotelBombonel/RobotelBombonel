@@ -1,1 +1,1 @@
-Hello, my name is RobotelBombonel, call me RBBL. I am working on projects like games, designs or creating an AI. I'm currecly creating an AI called OctoBlank, this AI will be capable of understanding images, creating images or even give you a full understand in coding. But as of now it is just a chatting AI
+
